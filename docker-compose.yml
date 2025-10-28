@@ -1,0 +1,36 @@
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports: ["9000:9000","9001:9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    ports: ["5000:5000"]
+    volumes:
+      - mlruns:/mlruns
+      - mlflow_db:/mlflow.db
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    env_file: 
+      - .env
+    ports: ["8000:8000"]
+    volumes:
+      - ./models:/app/models
+      - ./src:/app/src
+      - ./data:/app/data
+    depends_on: [mlflow, minio]
+
+volumes:
+  minio_data:
+  mlruns:
+  mlflow_db:
