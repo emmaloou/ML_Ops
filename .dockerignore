@@ -1,0 +1,9 @@
+data/
+mlruns/
+models/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.vscode/
+*.log
